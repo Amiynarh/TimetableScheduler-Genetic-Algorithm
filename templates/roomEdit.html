@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<fieldset class="fieldset">
+  <div class="tablink">
+    <button onclick="location.href='{% url 'roomAdd'%}'" class="submit"> Back </button>
+  </div>
+  <div class="tabcontent" id="edit">
+    <table class="editTable">
+      <thead>
+        <tr class="table-headers">
+          <th>Room Name</th>
+          <th>Seating Capacity</th>
+          <th>Delete</th>
+          <th class="empty"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for rm in rooms %}
+        <tr>
+          <td>{{rm.room_name}}</td>
+          <td>{{rm.seating_capacity}}</td>
+          <td class="empty">
+            <form action="{% url 'deleteroom' rm.id %}" method="post">
+              {% csrf_token %}
+              <input type="submit" value="X" class="cross">
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</fieldset>
+{% endblock %}
+
+
+

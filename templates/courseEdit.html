@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load index %}
+
+
+
+<fieldset class="fieldset">
+  <div class="tablink">
+    <!-- <a href="{% url 'courseAdd'%}">
+      <h1 onclick="openPage('new')" id="defaultOpen">Add Course</h1>
+    </a> -->
+    <!-- <h1 onclick="openPage('edit')" id="link_to_edit">Edit Courses</h1> -->
+    <button onclick="location.href='{% url 'courseAdd'%}'" class="submit"> Back </button>
+
+  </div>
+  <div class="tabcontent" id="edit">
+    <table class="editTable">
+      <thead>
+        <tr class="table-headers">
+          <th>Course Code</th>
+          <th>Course Name</th>
+          <th>Max students</th>
+          <th>Instructors</th>
+          <th>Departments</th>
+          <th>Level</th>
+          <th>Delete</th>
+          <th class="empty"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for crs in courses %}
+        <tr>
+          <td>{{crs.course_number}}</td>
+          <td>{{crs.course_name}}</td>
+          <td>{{crs.max_numb_students}}</td>
+          <!-- <td>{{instructor|dictKey:crs.course_number}}</td> -->
+          <td>
+            {% for instructor in crs.instructors.all %}
+                {{ instructor.name }}
+                {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </td>
+          <td>
+            {% for departments in crs.departments.all %}
+                {{ departments.name }}
+                {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </td>
+          <!-- <td>{{ crs.department }}</td> -->
+          <td>Level {{ crs.level }}</td>
+          <td class="empty">
+            <form action="{% url 'deletecourse' crs.course_number %}" method="post">
+              {% csrf_token %}
+              <input type="submit" value="X" class="cross">
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</fieldset>
+
+{% endblock %}

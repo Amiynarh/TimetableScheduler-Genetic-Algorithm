@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<fieldset>
+
+    <!-- <div class="scheduling-container">
+        <h1>Schedule Timetable</h1>
+        <p>Click the button below to start generating the timetable.</p>
+    </div> -->
+    <div class="col-lg-7 col-md-7 col-xl-7 col-xxl-7 col-sm-12 halfpart">
+        <div class="card">
+            <div class="txt">
+                <h2>Timetable Generator</h2>
+                <p>Let our Intelligent System schedule your classes!
+                    Click the button below to start generating the timetable.</p>
+            </div>
+            <div class="crdbtn">
+                <a href="{% url 'start_scheduling' %}" id='genButton' class="btn" onclick='document.getElementById("loaderClass").style.display="inline-block"'>Generate 
+                </a>
+                {% if user.is_authenticated %}
+                <div id="loaderClass" class="loaderClass">
+                    <span class="loaderClassValue"></span>
+                    <svg class="loader" width="40" height="40">
+                        <circle cx="20" cy="20" r="15"></circle>
+                        <animate attributeName="cx" from="0" to="300" dur="3s" fill="freeze" repeatCount="2"></animate>
+                    </svg>
+                    <a href="" class="btn terminateGens">Stop</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+{% endblock %}

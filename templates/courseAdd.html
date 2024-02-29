@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+
+<form method="post">
+  {% csrf_token %}
+  <fieldset>
+    <div class="tablink">
+      <h1 onclick="openPage('new')" id="defaultOpen">Courses</h1>
+      <a href="{% url 'courseEdit' %}">
+        <h1 onclick="openPage('edit')" id="link_to_edit" style="color: #ff3f3f;">Click to View</h1>
+      </a>
+    </div>
+    <div class="tabcontent" id="new" style = "display: flex; flex-direction: column; justify-content: space-between; gap: 2rem;">
+      {{ form.as_p }}
+      <div style="display: flex; justify-content: center; gap: 2rem;" >
+        <input type="submit" value="Submit" class="submit">
+        <button onclick="location.href='{% url 'schedule_page' %}'" type="button" class="submit" style="background-color: rgb(86, 86, 86);" > Next </button>
+
+      </div>
+
+    </div>
+  </fieldset>
+</form>
+
+{% endblock %}

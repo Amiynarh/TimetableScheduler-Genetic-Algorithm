@@ -1,0 +1,92 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Login</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="BUK">
+    <meta name="description" content="Login">
+
+    <!-- Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'CSS/login.css' %}">
+
+  </head>
+  <body>
+
+    <div id="login-container">
+      <form method="post" id="signup-form">
+        {% csrf_token %}
+        <div class="login-box-body">
+          <div class="row">
+            <div class="col">
+              <div class="text-center loginLeft">
+                <img class="logoLogin" src="{% static 'img/buklogo.png' %}">
+                <h3 class="Alignment">
+                  <center><strong>Bayero University</strong></center>
+                </h3>
+                <h3 class="Alignment">
+                  <center><strong>Kano</strong></center>
+                </h3>
+                <h5><a target="_blank" href="https://www.buk.edu.ng/">https://www.buk.edu.ng/</a></h5>
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Error!</strong> Please correct the following errors:
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+              </div>
+            </div>
+            <div class="col">
+              <div class="loginRight">
+                <h3><strong>Sign up </strong></h3>
+                <!-- Signup form fields -->
+                <div class="form-group has-feedback">
+                  {{ form.username }}
+                  <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                  {{ form.email }}
+                  <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                  {{ form.password1 }}
+                  <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                  {{ form.password2 }}
+                  <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                </div>
+                <button type="submit" class="btn btn-info"><span class="fa fa-unlock-alt" ></span>&nbsp;Sign up</button>
+                <a href="/accounts/login/" type="button" id="toggle-login" class="btn btn-primary">Back to Sign in</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  
+    <script>
+      document.getElementById('toggle-signup').addEventListener('click', function() {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('signup-form').style.display = 'block';
+      });
+  
+      document.getElementById('toggle-login').addEventListener('click', function() {
+        document.getElementById('signup-form').style.display = 'none';
+        document.getElementById('login-form').style.display = 'block';
+      });
+    </script>
+  </body>
+</html>

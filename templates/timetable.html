@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load index %}
+
+
+<div>
+  {% for dept_level, courses in department_levels.items %}
+    <h2 class="secHead">{{ dept_level.0 }} - Level {{ dept_level.1 }}</h2>
+    <table class="timetable">
+        <thead>
+            <tr>
+                <th>Day</th>
+                {% for timeslot in timeslots %}
+                    <th>{{ timeslot }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for day in days %}
+                <tr>
+                    <th>{{ day }}</th>
+                    {% for timeslot in timeslots %}
+                        <td>
+                            {% for course in courses %}
+                                {% if course.day == day and course.time == timeslot %}
+                                    {{ course.course_name }} ({{ course.instructors }}) - {{ course.room }}<br>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+  {% endfor %}
+</div>
+{% endblock %}
+
