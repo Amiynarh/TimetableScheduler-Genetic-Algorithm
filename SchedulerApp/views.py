@@ -1,17 +1,12 @@
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from .models import *
 from .forms import *
 from collections import defaultdict
-from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
 from .genetic_algorithm import *
 from django.contrib.auth import logout
-from django.http import HttpResponse
-from django.template.loader import render_to_string
 
 
 VARS = {'generationNum': 0,
@@ -78,30 +73,7 @@ def serialize_timetable(timetable):
                     })
     return serialized_data
 
-# Original code
-# def serialize_timetable(timetable):
-#     if timetable is None:
-#         return []
 
-#     serialized_data = []
-#     for lecture in timetable:
-#         course = lecture.course
-#         departments = course.departments.all()
-#         for dept in departments:
-#             try:
-#                 day, time = lecture.meeting_time.split(' ', 1)
-#             except ValueError:
-#                 day, time = "Unknown", "Unknown"
-#             serialized_data.append({
-#                 'department': dept.name,
-#                 'level': course.level,
-#                 'course_name': course.course_name,
-#                 'instructors': ", ".join([instructor.name for instructor in course.instructors.all()]),
-#                 'room': lecture.room.room_name,
-#                 'day': day,
-#                 'time': time
-#             })
-#     return serialized_data
 
 # # original code
 # @login_required
@@ -120,7 +92,6 @@ def serialize_timetable(timetable):
 #         'timeslots': timeslots
 #     })
 
-# original code
 @login_required
 def view_timetable(request):
     serialized_timetable = request.session.get('best_timetable', [])
@@ -150,22 +121,6 @@ def apiterminateGens(request):
     VARS['terminateGens'] = True
     return redirect('home')
 
-# def download_timetable(request):
-#     # Assuming you have a function to get serialized timetable data
-#     serialized_timetable = serialized_timetable()  # Replace with your method of getting data
-
-#     # Render the HTML template with your data
-#     html_string = render_to_string('timetable_pdf_template.html', {'timetable': serialized_timetable})
-    
-#     # Generate PDF from HTML string
-#     html = HTML(string=html_string)
-#     pdf = html.write_pdf()
-
-#     # Create HTTP response
-#     response = HttpResponse(pdf, content_type='application/pdf')
-#     response['Content-Disposition'] = 'attachment; filename="timetable.pdf"'
-
-#     return response
 '''
 Page Views
 '''
@@ -257,34 +212,6 @@ def courseDelete(request, pk):
         return redirect('courseEdit')
 
 
-
-# @login_required
-# def lectureAdd(request):
-#     form = LectureForm(request.POST or None)
-#     if request.method == 'POST':
-#         if form.is_valid():
-#             new_lecture = form.save()  # Save and get the instance
-#             messages.add_message(request, messages.INFO, f"Lecture {new_lecture.lecture_id} has been added")
-#             return redirect('lectureEdit')
-#     context = {'form': form}
-#     return render(request, 'lectureAdd.html', context)
-
-# @login_required
-# def lectureEdit(request):
-#     context = {'lectures': Lecture.objects.all()}
-#     return render(request, 'lectureEdit.html', context)
-
-
-# @login_required
-# def lectureDelete(request, pk):
-#     lecture = Lecture.objects.filter(pk=pk).first()
-#     if lecture and request.method == 'POST':
-#         lecture.delete()
-#         messages.add_message(request, messages.INFO, "Lecture successfully deleted")
-#         return redirect('lectureEdit')
-#     else:
-#         messages.add_message(request, messages.ERROR, "Lecture not found")
-#         return redirect('lectureEdit')
 
 '''
 Error pages
