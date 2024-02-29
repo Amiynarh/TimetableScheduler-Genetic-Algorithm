@@ -53,7 +53,7 @@ class UserSignupForm(UserCreationForm):
             'placeholder': 'Confirm Password',
             'id': 'id_password2',
         })
-        
+
     def clean(self):
         cleaned_data = super().clean()
         username = cleaned_data.get("username")
@@ -80,71 +80,56 @@ class UserSignupForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2']
 
-# class UserSignupForm(UserCreationForm):
-#     def __init__(self, *args, **kwargs):
-#         super(UserSignupForm, self).__init__(*args, **kwargs)
-#         self.fields['password1'].widget.attrs.update({
-#             'class': 'form-control',
-#             'type': 'password',
-#             'placeholder': 'Password',
-#             'id': 'id_password1',
-#         })
-#         self.fields['password2'].widget.attrs.update({
-#             'class': 'form-control',
-#             'type': 'password',
-#             'placeholder': 'Confirm Password',
-#             'id': 'id_password2',
-#         })
-
-#     username = forms.CharField(widget=forms.TextInput(
-#         attrs={
-#             'class': 'form-control',
-#             'type': 'text',
-#             'placeholder': 'Username',
-#             'id': 'id_username'
-#         }))
-#     email = forms.EmailField(widget=forms.EmailInput(
-#         attrs={
-#             'class': 'form-control',
-#             'type': 'email',
-#             'placeholder': 'Email',
-#             'id': 'id_email',
-#         }))
-#     class Meta:
-#         model = User
-#         fields = ['username', 'email', 'password1', 'password2']
-
-
 class RoomForm(forms.ModelForm):
     class Meta:
         model = Room
         fields = ['room_name', 'seating_capacity']
 
+# class InstructorForm(forms.ModelForm):
+#     preferred_time_slots = forms.MultipleChoiceField(choices=TIME_SLOTS, widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
+#     preferred_days = forms.MultipleChoiceField(choices=DAYS_OF_WEEK, widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
+
+#     class Meta:
+#         model = Instructor
+#         fields = ['name', 'preferred_time_slots', 'preferred_days']
+#         help_texts = {
+#             'preferred_time_slots': 'Hold down "Control", or "Command" on a Mac, to select more than one.',
+#             'preferred_days': 'Hold down "Control", or "Command" on a Mac, to select more than one.'
+#         }
+
 class InstructorForm(forms.ModelForm):
-    preferred_time_slots = forms.MultipleChoiceField(choices=TIME_SLOTS, widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
-    preferred_days = forms.MultipleChoiceField(choices=DAYS_OF_WEEK, widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
+    preferred_time_slots = forms.MultipleChoiceField(
+        choices=TIME_SLOTS,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-group'})
+        # widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-control'})
+    )
+    preferred_days = forms.MultipleChoiceField(
+        choices=DAYS_OF_WEEK,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-group'})
+        # widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-control'})
+    )
 
     class Meta:
         model = Instructor
         fields = ['name', 'preferred_time_slots', 'preferred_days']
         help_texts = {
-            'preferred_time_slots': 'Hold down "Control", or "Command" on a Mac, to select more than one.',
-            'preferred_days': 'Hold down "Control", or "Command" on a Mac, to select more than one.'
+            'preferred_time_slots': 'Select one or more preferred time slots.',
+            'preferred_days': 'Select one or more preferred days.'
         }
-
-
 
 class CourseForm(forms.ModelForm):
 
     instructors = forms.ModelMultipleChoiceField(
         queryset=Instructor.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-group'}),
+        # widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
         required=False
     )
     
     departments = forms.ModelMultipleChoiceField(
         queryset=Department.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-group'}),
+        # widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
         required=False
     )
 
@@ -160,7 +145,7 @@ class CourseForm(forms.ModelForm):
         model = Course
         fields = ['course_number', 'course_name', 'max_numb_students', 'instructors', 'departments', 'level']  # Changed 'department' to 'departments'
         widgets = {
-            'course_number': forms.TextInput(attrs={'placeholder': 'e.g. 2301'}),
+            'course_number': forms.TextInput(attrs={'placeholder': 'e.g. CSC2301'}),
             'course_name': forms.TextInput(attrs={'placeholder': 'e.g. DBMS'})
         }
 

@@ -5,6 +5,7 @@
 
 
 <div>
+    <button class="print-button submit">Print</button>
   {% for dept_level, courses in department_levels.items %}
     <h2 class="secHead">{{ dept_level.0 }} - Level {{ dept_level.1 }}</h2>
     <table class="timetable">
@@ -35,5 +36,12 @@
     </table>
   {% endfor %}
 </div>
+
+<script>
+    document.querySelector(".print-button").addEventListener("click", function() {
+      window.print();
+    });
+  </script>
+  
 {% endblock %}
 

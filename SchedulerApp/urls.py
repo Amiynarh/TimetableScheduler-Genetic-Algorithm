@@ -11,6 +11,8 @@ urlpatterns = [
     path('schedule_page/', schedule_page, name='schedule_page'),
     path('start-scheduling/', start_scheduling, name='start_scheduling'),
     path('view-timetable/', view_timetable, name='view_timetable'),
+    # path('timetable/print/', print_timetable, name='print_timetable'),  # Add this line
+
 
     path('instructorAdd/', instructorAdd, name='instructorAdd'),
     path('instructorEdit/', instructorEdit, name='instructorEdit'),

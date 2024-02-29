@@ -66,9 +66,9 @@ class Course(models.Model):
         (3, 'Level 3'),
         (4, 'Level 4'),
     ]
-
-    course_number = models.CharField(max_length=5, primary_key=True)
-    course_name = models.CharField(max_length=40)
+    course_number = models.CharField(max_length=7, primary_key=True)  # Adjusted max_length
+    # course_number = models.CharField(max_length=5, primary_key=True)
+    course_name = models.CharField(max_length=15)
     max_numb_students = models.IntegerField(default=0)
     instructors = models.ManyToManyField(Instructor)
     departments = models.ManyToManyField('Department', related_name='courses')  # Many-to-Many relationship

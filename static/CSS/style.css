@@ -644,4 +644,23 @@ fieldset {
   height: 2.6rem;
 }
 
+@media print {
+  /* Additional styles for printing, like hiding unnecessary elements */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  .navigation-bar, .header {
+    display: none;
+  }
+}
 
+/* custom.css */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0; /* Adjust as necessary */
+}
+.checkbox-group .form-check {
+  margin-right: 20px; /* Space out checkboxes */
+}

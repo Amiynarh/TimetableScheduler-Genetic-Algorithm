@@ -10,6 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .genetic_algorithm import *
 from django.contrib.auth import logout
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 
 
 VARS = {'generationNum': 0,
@@ -101,51 +103,45 @@ def serialize_timetable(timetable):
 #             })
 #     return serialized_data
 
-# original code
-@login_required
-def view_timetable(request):
-    serialized_timetable = request.session.get('best_timetable', [])
-    department_levels = {}
-    # print(f"Serialised Timetable: {serialized_timetable}")
-
-    for item in serialized_timetable:
-        dept_level = (item['department'], item['level'])
-        department_levels.setdefault(dept_level, []).append(item)
-
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-    timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
-    # print(f"Department Levels: {department_levels}")
-    return render(request, 'timetable.html', {
-        'department_levels': department_levels,
-        'days': days,
-        'timeslots': timeslots
-    })
-
+# # original code
 # @login_required
 # def view_timetable(request):
 #     serialized_timetable = request.session.get('best_timetable', [])
 #     department_levels = {}
-#     unique_courses = set()  # To track unique course entries
-
-#     filtered_timetable = []
 #     for item in serialized_timetable:
-#         identifier = (item['day'], item['time'], item['course_name'])
-#         if identifier not in unique_courses:
-#             unique_courses.add(identifier)
-#             filtered_timetable.append(item)
-
-#     for item in filtered_timetable:
 #         dept_level = (item['department'], item['level'])
 #         department_levels.setdefault(dept_level, []).append(item)
-
 #     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 #     timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
+#     # print(f"Department Levels: {department_levels}")
 #     return render(request, 'timetable.html', {
 #         'department_levels': department_levels,
 #         'days': days,
 #         'timeslots': timeslots
 #     })
 
+# original code
+@login_required
+def view_timetable(request):
+    serialized_timetable = request.session.get('best_timetable', [])
+    department_levels = {}
+    for item in serialized_timetable:
+        dept_level = (item['department'], item['level'])
+        department_levels.setdefault(dept_level, []).append(item)
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
+    if request.method == 'POST' and 'print_button' in request.POST:
+        return render(request, 'timetable_print.html', {
+            'department_levels': department_levels,
+            'days': days,
+            'timeslots': timeslots
+        })
+
+    return render(request, 'timetable.html', {
+        'department_levels': department_levels,
+        'days': days,
+        'timeslots': timeslots
+    })
 
 def apiGenNum(request):
     return JsonResponse({'genNum': VARS['generationNum']})
