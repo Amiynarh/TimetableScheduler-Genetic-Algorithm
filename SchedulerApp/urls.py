@@ -4,15 +4,11 @@ from .views import *
 
 urlpatterns = [
     path('', home, name='home'),
-    # path('timetableGeneration/', timetable, name='timetable'),
-    # path('download-timetable/', views.download_timetable, name='download_timetable'),
 
     path('logout/', logout_view, name='logout'),
     path('schedule_page/', schedule_page, name='schedule_page'),
     path('start-scheduling/', start_scheduling, name='start_scheduling'),
     path('view-timetable/', view_timetable, name='view_timetable'),
-    # path('timetable/print/', print_timetable, name='print_timetable'),  # Add this line
-
 
     path('instructorAdd/', instructorAdd, name='instructorAdd'),
     path('instructorEdit/', instructorEdit, name='instructorEdit'),
