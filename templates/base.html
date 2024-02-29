@@ -52,7 +52,7 @@
           <li class="{% active request home %}"><a href="{{ home }}">Home</a></li>
           <li class="{% active request instructorAdd %}"><a href="{{ instructorAdd }}">Instructor</a></li>
           <li class="{% active request roomAdd %}"><a href="{{ roomAdd }}">Classroom</a></li>
-          <li class="{% active request courseAdd %}"><a href="{{ courseAdd }}">Course</a></li>
+          <li class="{% active request courseAdd %}"><a href="{{ courseAdd }}">Lecture</a></li>
           <li class="{% active request 'schedule_page' %}"><a href="{% url 'schedule_page' %}">Schedule Timetable</a></li>
           {% if user.is_authenticated %}
           <li><a href="{% url 'logout' %}"><i style="font-size:1.6rem" class="fa">&#xf08b;</i>Logout</a></li>
