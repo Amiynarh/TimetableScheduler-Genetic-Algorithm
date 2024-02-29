@@ -43,48 +43,108 @@ def start_scheduling(request):
     request.session['best_timetable'] = serialized_timetable
     return redirect('view_timetable')
 
-
 def serialize_timetable(timetable):
     if timetable is None:
         return []
 
     serialized_data = []
+    existing_entries = set()  # To track existing entries and prevent duplicates
+
     for lecture in timetable:
         course = lecture.course
         departments = course.departments.all()
         for dept in departments:
-            try:
-                day, time = lecture.meeting_time.split(' ', 1)
-            except ValueError:
-                day, time = "Unknown", "Unknown"
-            serialized_data.append({
-                'department': dept.name,
-                'level': course.level,
-                'course_name': course.course_name,
-                'instructors': ", ".join([instructor.name for instructor in course.instructors.all()]),
-                'room': lecture.room.room_name,
-                'day': day,
-                'time': time
-            })
+            times = lecture.meeting_time.split(', ')
+            for time in times:
+                try:
+                    day, time = time.split(' ', 1)
+                except ValueError:
+                    day, time = "Unknown", "Unknown"
+                # Creating a unique identifier for each entry
+                entry_identifier = (dept.name, course.level, course.course_name, ", ".join([instructor.name for instructor in course.instructors.all()]), lecture.room.room_name, day, time)
+
+                if entry_identifier not in existing_entries:
+                    existing_entries.add(entry_identifier)
+                    serialized_data.append({
+                        'department': dept.name,
+                        'level': course.level,
+                        'course_name': course.course_name,
+                        'instructors': ", ".join([instructor.name for instructor in course.instructors.all()]),
+                        'room': lecture.room.room_name,
+                        'day': day,
+                        'time': time
+                    })
     return serialized_data
 
+# Original code
+# def serialize_timetable(timetable):
+#     if timetable is None:
+#         return []
 
+#     serialized_data = []
+#     for lecture in timetable:
+#         course = lecture.course
+#         departments = course.departments.all()
+#         for dept in departments:
+#             try:
+#                 day, time = lecture.meeting_time.split(' ', 1)
+#             except ValueError:
+#                 day, time = "Unknown", "Unknown"
+#             serialized_data.append({
+#                 'department': dept.name,
+#                 'level': course.level,
+#                 'course_name': course.course_name,
+#                 'instructors': ", ".join([instructor.name for instructor in course.instructors.all()]),
+#                 'room': lecture.room.room_name,
+#                 'day': day,
+#                 'time': time
+#             })
+#     return serialized_data
+
+# original code
 @login_required
 def view_timetable(request):
     serialized_timetable = request.session.get('best_timetable', [])
     department_levels = {}
+    # print(f"Serialised Timetable: {serialized_timetable}")
+
     for item in serialized_timetable:
         dept_level = (item['department'], item['level'])
         department_levels.setdefault(dept_level, []).append(item)
 
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
-    
+    # print(f"Department Levels: {department_levels}")
     return render(request, 'timetable.html', {
         'department_levels': department_levels,
         'days': days,
         'timeslots': timeslots
     })
+
+# @login_required
+# def view_timetable(request):
+#     serialized_timetable = request.session.get('best_timetable', [])
+#     department_levels = {}
+#     unique_courses = set()  # To track unique course entries
+
+#     filtered_timetable = []
+#     for item in serialized_timetable:
+#         identifier = (item['day'], item['time'], item['course_name'])
+#         if identifier not in unique_courses:
+#             unique_courses.add(identifier)
+#             filtered_timetable.append(item)
+
+#     for item in filtered_timetable:
+#         dept_level = (item['department'], item['level'])
+#         department_levels.setdefault(dept_level, []).append(item)
+
+#     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+#     timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
+#     return render(request, 'timetable.html', {
+#         'department_levels': department_levels,
+#         'days': days,
+#         'timeslots': timeslots
+#     })
 
 
 def apiGenNum(request):
