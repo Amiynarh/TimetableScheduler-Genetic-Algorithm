@@ -67,7 +67,6 @@ class Course(models.Model):
         (4, 'Level 4'),
     ]
     course_number = models.CharField(max_length=7, primary_key=True)  # Adjusted max_length
-    # course_number = models.CharField(max_length=5, primary_key=True)
     course_name = models.CharField(max_length=15)
     max_numb_students = models.IntegerField(default=0)
     instructors = models.ManyToManyField(Instructor)
@@ -81,8 +80,6 @@ class Department(models.Model):
     name = models.CharField(max_length=100, unique=True)
     
     def get_occupied_timeslots(self):
-        # This is a conceptual implementation. 
-        # You'll need to adjust it according to your actual data models and relationships.
         occupied_timeslots = set()
         for course in self.courses.all():  # Assuming a reverse relationship from Course to Department
             for lecture in course.lecture_set.all():
