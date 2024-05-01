@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from .models import *
 from .forms import *
@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .genetic_algorithm import *
 from django.contrib.auth import logout
-
+from django.utils import timezone
 
 VARS = {'generationNum': 0,
         'terminateGens': False}
@@ -33,12 +33,29 @@ def logout_view(request):
 def schedule_page(request):
     return render(request, 'schedule_page.html')
 
+@login_required
 def start_scheduling(request):
     best_timetable = run_genetic_algorithm()
-    # Serialize the data, if necessary
-    serialized_timetable = serialize_timetable(best_timetable)  # Implement this function
-    request.session['best_timetable'] = serialized_timetable
-    return redirect('view_timetable')
+    serialized_timetable = serialize_timetable(best_timetable)  # Adjust according to your implementation
+    # Save to database
+    Timetable.objects.create(data=serialized_timetable, created_at=timezone.now())
+    # Redirect to a page where user can select view
+    return redirect('select_timetable_view')
+
+# views.py
+def select_timetable_view(request):
+    # You might want to pass the latest timetable ID or timestamp to ensure the user selects the correct one
+    latest_timetable = Timetable.objects.latest('created_at')
+    return render(request, 'select_view.html', {'timetable_id': latest_timetable.id})
+
+
+# def start_scheduling(request):
+#     best_timetable = run_genetic_algorithm()
+#     # Serialize the data, if necessary
+#     serialized_timetable = serialize_timetable(best_timetable)  # Implement this function
+#     request.session['best_timetable'] = serialized_timetable
+#     return redirect('view_timetable')
+
 
 def serialize_timetable(timetable):
     if timetable is None:
@@ -75,26 +92,10 @@ def serialize_timetable(timetable):
 
 
 
-# # original code
-# @login_required
-# def view_timetable(request):
-#     serialized_timetable = request.session.get('best_timetable', [])
-#     department_levels = {}
-#     for item in serialized_timetable:
-#         dept_level = (item['department'], item['level'])
-#         department_levels.setdefault(dept_level, []).append(item)
-#     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-#     timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
-#     # print(f"Department Levels: {department_levels}")
-#     return render(request, 'timetable.html', {
-#         'department_levels': department_levels,
-#         'days': days,
-#         'timeslots': timeslots
-#     })
 
-@login_required
-def view_timetable(request):
-    serialized_timetable = request.session.get('best_timetable', [])
+def view_timetable(request, timetable_id):
+    timetable = Timetable.objects.get(id=timetable_id)
+    serialized_timetable = timetable.data
     department_levels = {}
     for item in serialized_timetable:
         dept_level = (item['department'], item['level'])
@@ -113,6 +114,89 @@ def view_timetable(request):
         'days': days,
         'timeslots': timeslots
     })
+
+
+# def view_instructor_timetable(request, timetable_id):
+#     timetable_obj = Timetable.objects.get(id=timetable_id)
+#     serialized_timetable = timetable_obj.data
+    
+#     # Initialize a structure to hold each instructor's courses, organized by day and timeslot
+#     instructor_schedules = defaultdict(lambda: defaultdict(list))
+    
+#     for item in serialized_timetable:
+#         for instructor in item['instructors'].split(', '):
+#             day_time = f"{item['day']} {item['time']}"
+#             instructor_schedules[instructor][day_time].append(item)
+
+#     context = {
+#         'instructor_schedules': dict(instructor_schedules),
+#         'days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+#         'timeslots': ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00'],
+#     }
+#     return render(request, 'instructors_timetable.html', context)
+
+# def view_instructor_timetable(request, timetable_id):
+#     timetable_obj = Timetable.objects.get(id=timetable_id)
+#     serialized_timetable = timetable_obj.data
+
+#     # Initialize a structure to hold each instructor's timetable organized by day and timeslot
+#     instructors_timetable = {}
+#     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+#     timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
+    
+#     # Process serialized timetable data
+#     for item in serialized_timetable:
+#         for instructor in item['instructors'].split(', '):
+#             if instructor not in instructors_timetable:
+#                 instructors_timetable[instructor] = {day: {timeslot: [] for timeslot in timeslots} for day in days}
+#             instructors_timetable[instructor][item['day']][item['time']].append(item)
+
+#     context = {
+#         'instructors_timetable': instructors_timetable,
+#         'days': days,
+#         'timeslots': timeslots,
+#     }
+#     return render(request, 'instructors_timetable.html', context)
+
+def view_instructor_timetable(request, timetable_id):
+    timetable_obj = Timetable.objects.get(id=timetable_id)
+    serialized_timetable = timetable_obj.data
+
+    instructors_timetable = {}
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
+
+    for entry in serialized_timetable:
+        for instructor in entry['instructors'].split(', '):
+            if instructor not in instructors_timetable:
+                instructors_timetable[instructor] = {day: {timeslot: "" for timeslot in timeslots} for day in days}
+            instructors_timetable[instructor][entry['day']][entry['time']] = f"{entry['course_name']} - {entry['room']}"
+
+    return render(request, 'instructors_timetable.html', {
+        'instructors_timetable': instructors_timetable,
+        'days': days,
+        'timeslots': timeslots,
+    })
+
+# def view_instructor_timetable(request, timetable_id):
+#     timetable_obj = Timetable.objects.get(id=timetable_id)
+#     serialized_timetable = timetable_obj.data
+
+#     instructors_timetable = {}
+#     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+#     timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
+
+#     for entry in serialized_timetable:
+#         for instructor in entry['instructors'].split(', '):
+#             if instructor not in instructors_timetable:
+#                 instructors_timetable[instructor] = {day: {timeslot: "" for timeslot in timeslots} for day in days}
+#             instructors_timetable[instructor][entry['day']][entry['time']] = f"{entry['course_name']} - {entry['room']}"
+
+#     return render(request, 'instructors_timetable.html', {
+#         'instructors_timetable': instructors_timetable,
+#         'days': days,
+#         'timeslots': timeslots,
+#     })
 
 def apiGenNum(request):
     return JsonResponse({'genNum': VARS['generationNum']})
