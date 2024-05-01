@@ -49,12 +49,8 @@ def select_timetable_view(request):
     return render(request, 'select_view.html', {'timetable_id': latest_timetable.id})
 
 
-# def start_scheduling(request):
-#     best_timetable = run_genetic_algorithm()
-#     # Serialize the data, if necessary
-#     serialized_timetable = serialize_timetable(best_timetable)  # Implement this function
-#     request.session['best_timetable'] = serialized_timetable
-#     return redirect('view_timetable')
+def generate_timetable(request):
+    return render(request, 'index.html')
 
 
 def serialize_timetable(timetable):
@@ -116,47 +112,6 @@ def view_timetable(request, timetable_id):
     })
 
 
-# def view_instructor_timetable(request, timetable_id):
-#     timetable_obj = Timetable.objects.get(id=timetable_id)
-#     serialized_timetable = timetable_obj.data
-    
-#     # Initialize a structure to hold each instructor's courses, organized by day and timeslot
-#     instructor_schedules = defaultdict(lambda: defaultdict(list))
-    
-#     for item in serialized_timetable:
-#         for instructor in item['instructors'].split(', '):
-#             day_time = f"{item['day']} {item['time']}"
-#             instructor_schedules[instructor][day_time].append(item)
-
-#     context = {
-#         'instructor_schedules': dict(instructor_schedules),
-#         'days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-#         'timeslots': ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00'],
-#     }
-#     return render(request, 'instructors_timetable.html', context)
-
-# def view_instructor_timetable(request, timetable_id):
-#     timetable_obj = Timetable.objects.get(id=timetable_id)
-#     serialized_timetable = timetable_obj.data
-
-#     # Initialize a structure to hold each instructor's timetable organized by day and timeslot
-#     instructors_timetable = {}
-#     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-#     timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
-    
-#     # Process serialized timetable data
-#     for item in serialized_timetable:
-#         for instructor in item['instructors'].split(', '):
-#             if instructor not in instructors_timetable:
-#                 instructors_timetable[instructor] = {day: {timeslot: [] for timeslot in timeslots} for day in days}
-#             instructors_timetable[instructor][item['day']][item['time']].append(item)
-
-#     context = {
-#         'instructors_timetable': instructors_timetable,
-#         'days': days,
-#         'timeslots': timeslots,
-#     }
-#     return render(request, 'instructors_timetable.html', context)
 
 def view_instructor_timetable(request, timetable_id):
     timetable_obj = Timetable.objects.get(id=timetable_id)
@@ -178,25 +133,6 @@ def view_instructor_timetable(request, timetable_id):
         'timeslots': timeslots,
     })
 
-# def view_instructor_timetable(request, timetable_id):
-#     timetable_obj = Timetable.objects.get(id=timetable_id)
-#     serialized_timetable = timetable_obj.data
-
-#     instructors_timetable = {}
-#     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-#     timeslots = ['8:00 - 10:00', '10:00 - 12:00', '12:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00']
-
-#     for entry in serialized_timetable:
-#         for instructor in entry['instructors'].split(', '):
-#             if instructor not in instructors_timetable:
-#                 instructors_timetable[instructor] = {day: {timeslot: "" for timeslot in timeslots} for day in days}
-#             instructors_timetable[instructor][entry['day']][entry['time']] = f"{entry['course_name']} - {entry['room']}"
-
-#     return render(request, 'instructors_timetable.html', {
-#         'instructors_timetable': instructors_timetable,
-#         'days': days,
-#         'timeslots': timeslots,
-#     })
 
 def apiGenNum(request):
     return JsonResponse({'genNum': VARS['generationNum']})
@@ -209,8 +145,11 @@ def apiterminateGens(request):
 Page Views
 '''
 
+# def home(request):
+#     return render(request, 'index.html', {})
+
 def home(request):
-    return render(request, 'index.html', {})
+    return render(request, 'homepage.html', {})
 
 @login_required
 def instructorAdd(request):

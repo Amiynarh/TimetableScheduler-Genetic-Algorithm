@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="{% static 'js/script.js' %}" ></script>
+
+
+
+<div class="container-fluid" >
+      <div class="card">
+        <div class="txt" style="text-align: center;">
+          <h1>Effortless Timetable Management</h1>
+          <p class="p-bold">Streamline your scheduling with our powerful timetable system. Easily create, manage, <br> and view timetables for your organization.</p>
+        </div>
+
+        <div class="crdbtn" style="display: flex; justify-content: center; gap: 2rem;">
+          <a href="{% url 'select_timetable_view' %}" class="btn">View Timetable</a>
+          <a href="{% url 'generate_timetable' %}" class="btn-trans">Generate Timetable</a>
+        </div>
+      </div>
+ </div>
+
+{% endblock %}

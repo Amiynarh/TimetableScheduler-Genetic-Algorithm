@@ -8,8 +8,8 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('schedule_page/', schedule_page, name='schedule_page'),
     path('start-scheduling/', start_scheduling, name='start_scheduling'),
-    # path('view-timetable/', view_timetable, name='view_timetable'),
-    # path('instructor-timetable/', view_instructor_timetable, name='instructor_timetable'),
+    path('generate-timetable/', generate_timetable, name='generate_timetable'),
+
 
     path('timetable/select-view/', select_timetable_view, name='select_timetable_view'),
     path('timetable/view/<int:timetable_id>/', view_timetable, name='view_timetable'),
