@@ -26,6 +26,9 @@ DAYS_OF_WEEK = (
     ('Saturday', 'Saturday'),
 )
     
+class Timetable(models.Model):
+    data = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
     
 class Instructor(models.Model):
     uid = models.CharField(max_length=3, blank=True)

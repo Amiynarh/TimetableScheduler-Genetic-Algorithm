@@ -50,6 +50,57 @@ def identify_common_courses(courses):
             common_courses[course] = list(departments)
     return common_courses
 
+def is_preferred_time(instructor, meeting_time, scheduler_data):
+    preferred_times = [f"{day} {timeslot}" for day in instructor.preferred_days for timeslot in instructor.preferred_time_slots]
+    return meeting_time in preferred_times
+
+def is_department_level_overlap(course, meeting_time, timetable):
+    for scheduled_course in timetable:
+        if scheduled_course.meeting_time == meeting_time:
+            if course.level == scheduled_course.course.level and \
+               set(course.departments.all()).intersection(set(scheduled_course.course.departments.all())):
+                return True  # Found an overlap
+    return False
+
+def find_preferred_timeslots(instructors):
+    preferred_timeslots = {}
+    for instructor in instructors:
+        for day in instructor.preferred_days:
+            for timeslot in instructor.preferred_time_slots:
+                key = f"{day} {timeslot}"
+                if key in preferred_timeslots:
+                    preferred_timeslots[key] += 1
+                else:
+                    preferred_timeslots[key] = 1
+    # Sort timeslots by the number of instructors preferring them, descending
+    sorted_preferred_timeslots = sorted(preferred_timeslots.items(), key=lambda x: x[1], reverse=True)
+    return [timeslot for timeslot, count in sorted_preferred_timeslots]
+
+def schedule_course(course, timetable):
+    suitable_rooms = sorted([room for room in Room.objects.all() if room.seating_capacity >= course.max_numb_students],
+                            key=lambda r: abs(r.seating_capacity - course.max_numb_students))
+    selected_room = suitable_rooms[0] if suitable_rooms else random.choice(Room.objects.all())
+
+    combined_slots = [(day, time) for day in DAYS_OF_WEEK for time in TIME_SLOTS]
+    random.shuffle(combined_slots)
+
+    instructors = course.instructors.all()
+    preferred_timeslots = find_preferred_timeslots(instructors, combined_slots)
+
+    # Try to schedule in a preferred timeslot first
+    for timeslot in preferred_timeslots:
+        if not any(lecture.meeting_time == timeslot and lecture.course == course for lecture in timetable) and not is_department_level_overlap(course, timeslot, timetable):
+            new_lecture = Lecture(course=course, room=selected_room, meeting_time=timeslot)
+            timetable.append(new_lecture)
+            return  # Successfully scheduled with preference
+
+    # If no preferred time found or scheduled, try without preference but avoid department level overlap
+    for day, timeslot in combined_slots:
+        meeting_time = format_meeting_time(day, timeslot)
+        if not any(lecture.meeting_time == meeting_time and lecture.course == course for lecture in timetable) and not is_department_level_overlap(course, meeting_time, timetable):
+            new_lecture = Lecture(course=course, room=selected_room, meeting_time=meeting_time)
+            timetable.append(new_lecture)
+            break  # Successfully scheduled without causing overlap
 
 def schedule_common_course(course, common_courses, timetable, rooms):
     total_students = course.max_numb_students
@@ -70,19 +121,44 @@ def schedule_common_course(course, common_courses, timetable, rooms):
     else:
         print(f"Failed to schedule common course {course.name} due to timeslot conflicts.")
 
-def schedule_course(course, timetable):
-    suitable_rooms = sorted([room for room in Room.objects.all() if room.seating_capacity >= course.max_numb_students],
-                            key=lambda r: abs(r.seating_capacity - course.max_numb_students))
-    selected_room = suitable_rooms[0] if suitable_rooms else random.choice(Room.objects.all())
+# def schedule_course(course, timetable):
+#     suitable_rooms = sorted([room for room in Room.objects.all() if room.seating_capacity >= course.max_numb_students],
+#                             key=lambda r: abs(r.seating_capacity - course.max_numb_students))
+#     selected_room = suitable_rooms[0] if suitable_rooms else random.choice(Room.objects.all())
 
-    combined_slots = [(day, time) for day in DAYS_OF_WEEK for time in TIME_SLOTS]
-    random.shuffle(combined_slots)
-    for day, timeslot in combined_slots:
-        meeting_time = format_meeting_time(day, timeslot)
-        if not any(lecture.meeting_time == meeting_time and lecture.course == course for lecture in timetable):
-            new_lecture = Lecture(course=course, room=selected_room, meeting_time=meeting_time)
-            timetable.append(new_lecture)
-            break
+#     combined_slots = [(day, time) for day in DAYS_OF_WEEK for time in TIME_SLOTS]
+#     random.shuffle(combined_slots)
+
+#     # First, try to schedule based on instructor preferences
+#     for instructor in course.instructors.all():
+#         for day, timeslot in combined_slots:
+#             meeting_time = format_meeting_time(day, timeslot)
+#             if is_preferred_time(instructor, meeting_time) and not any(lecture.meeting_time == meeting_time and lecture.course == course for lecture in timetable) and not is_department_level_overlap(course, meeting_time, timetable):
+#                 new_lecture = Lecture(course=course, room=selected_room, meeting_time=meeting_time)
+#                 timetable.append(new_lecture)
+#                 return  # Successfully scheduled with preference
+
+#     # If no preferred time found or scheduled, try without preference but avoid department level overlap
+#     for day, timeslot in combined_slots:
+#         meeting_time = format_meeting_time(day, timeslot)
+#         if not any(lecture.meeting_time == meeting_time and lecture.course == course for lecture in timetable) and not is_department_level_overlap(course, meeting_time, timetable):
+#             new_lecture = Lecture(course=course, room=selected_room, meeting_time=meeting_time)
+#             timetable.append(new_lecture)
+#             break  # Successfully scheduled without causing overlap
+
+# def schedule_course(course, timetable):
+#     suitable_rooms = sorted([room for room in Room.objects.all() if room.seating_capacity >= course.max_numb_students],
+#                             key=lambda r: abs(r.seating_capacity - course.max_numb_students))
+#     selected_room = suitable_rooms[0] if suitable_rooms else random.choice(Room.objects.all())
+
+#     combined_slots = [(day, time) for day in DAYS_OF_WEEK for time in TIME_SLOTS]
+#     random.shuffle(combined_slots)
+#     for day, timeslot in combined_slots:
+#         meeting_time = format_meeting_time(day, timeslot)
+#         if not any(lecture.meeting_time == meeting_time and lecture.course == course for lecture in timetable):
+#             new_lecture = Lecture(course=course, room=selected_room, meeting_time=meeting_time)
+#             timetable.append(new_lecture)
+#             break
 
 def select_timeslot_for_common_course(departments, instructors):
     occupied_timeslots = set()
@@ -172,6 +248,39 @@ def generate_individual(scheduler_data):
 def generate_initial_population(population_size, scheduler_data):
     return [generate_individual(scheduler_data) for _ in range(population_size)]
 
+# def calculate_fitness(timetable, scheduler_data):
+#     penalty = 0
+#     HIGH_PENALTY = 100
+#     PREFERENCE_PENALTY = 50  # Penalty for not meeting instructor preferences
+#     DEPT_LEVEL_PENALTY = 50  # Penalty for department and level overlap
+
+#     for i, lecture1 in enumerate(timetable):
+#         for j, lecture2 in enumerate(timetable):
+#             if i != j:
+#                 # Check for room and instructor overlap
+#                 if lecture1.room == lecture2.room and lecture1.meeting_time == lecture2.meeting_time:
+#                     penalty += HIGH_PENALTY
+#                 if set(lecture1.course.instructors.all()).intersection(lecture2.course.instructors.all()) and lecture1.meeting_time == lecture2.meeting_time:
+#                     penalty += HIGH_PENALTY
+
+#                 # Check for department and level overlap
+#                 departments1 = set(lecture1.course.departments.all())
+#                 departments2 = set(lecture2.course.departments.all())
+#                 if departments1.intersection(departments2) and lecture1.course.level == lecture2.course.level and lecture1.meeting_time == lecture2.meeting_time:
+#                     penalty += DEPT_LEVEL_PENALTY
+
+#     for lecture in timetable:
+#         # Check room capacity
+#         if lecture.course.max_numb_students > lecture.room.seating_capacity:
+#             penalty += HIGH_PENALTY
+
+#         # Check for instructor preferences
+#         for instructor in lecture.course.instructors.all():
+#             if not is_preferred_time(instructor, lecture.meeting_time, scheduler_data):
+#                 penalty += PREFERENCE_PENALTY
+
+#     return penalty
+
 def calculate_fitness(timetable, scheduler_data):
     penalty = 0
     HIGH_PENALTY = 100
@@ -183,32 +292,36 @@ def calculate_fitness(timetable, scheduler_data):
             if i != j:
                 # Check for room and instructor overlap
                 if lecture1.room == lecture2.room and lecture1.meeting_time == lecture2.meeting_time:
+                    print(f"Room overlap penalty: {lecture1.course.course_name} and {lecture2.course.course_name} in {lecture1.room.room_name} at {lecture1.meeting_time}")
+
                     penalty += HIGH_PENALTY
                 if set(lecture1.course.instructors.all()).intersection(lecture2.course.instructors.all()) and lecture1.meeting_time == lecture2.meeting_time:
+                    instructors = ', '.join([instructor.name for instructor in lecture1.course.instructors.all().intersection(lecture2.course.instructors.all())])
+                    print(f"Instructor overlap penalty: {instructors} for courses {lecture1.course.course_name} and {lecture2.course.course_name} at {lecture1.meeting_time}")
                     penalty += HIGH_PENALTY
 
                 # Check for department and level overlap
                 departments1 = set(lecture1.course.departments.all())
                 departments2 = set(lecture2.course.departments.all())
                 if departments1.intersection(departments2) and lecture1.course.level == lecture2.course.level and lecture1.meeting_time == lecture2.meeting_time:
+                    dept_names = ', '.join([dept.name for dept in departments1.intersection(departments2)])
+                    print(f"Department and level overlap penalty: {dept_names} for courses {lecture1.course.course_name} and {lecture2.course.course_name} at {lecture1.meeting_time}")
                     penalty += DEPT_LEVEL_PENALTY
 
     for lecture in timetable:
         # Check room capacity
         if lecture.course.max_numb_students > lecture.room.seating_capacity:
+            print(f"Room capacity penalty: {lecture.course.course_name} has {lecture.course.max_numb_students} students but room {lecture.room.name} has capacity {lecture.room.seating_capacity}")
             penalty += HIGH_PENALTY
 
         # Check for instructor preferences
         for instructor in lecture.course.instructors.all():
             if not is_preferred_time(instructor, lecture.meeting_time, scheduler_data):
+                print(f"Instructor preference penalty: {instructor.name} does not prefer {lecture.meeting_time} for {lecture.course.course_name}")
                 penalty += PREFERENCE_PENALTY
 
     return penalty
 
-
-def is_preferred_time(instructor, meeting_time, scheduler_data):
-    preferred_times = [f"{day} {timeslot}" for day in instructor.preferred_days for timeslot in instructor.preferred_time_slots]
-    return meeting_time in preferred_times
 
 def tournament_selection(population, fitness_scores, tournament_size=3):
     selected_parents = []

@@ -87,24 +87,34 @@ class RoomForm(forms.ModelForm):
 
 
 
+# class InstructorForm(forms.ModelForm):
+#     preferred_time_slots = forms.MultipleChoiceField(
+#         choices=TIME_SLOTS,
+#         widget=forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-group'})
+#     )
+#     preferred_days = forms.MultipleChoiceField(
+#         choices=DAYS_OF_WEEK,
+#         widget=forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-group'})
+#     )
+
+#     class Meta:
+#         model = Instructor
+#         fields = ['name', 'preferred_time_slots', 'preferred_days']
+#         help_texts = {
+#             'preferred_time_slots': 'Select one or more preferred time slots.',
+#             'preferred_days': 'Select one or more preferred days.'
+#         }
 class InstructorForm(forms.ModelForm):
-    preferred_time_slots = forms.MultipleChoiceField(
-        choices=TIME_SLOTS,
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-group'})
-    )
-    preferred_days = forms.MultipleChoiceField(
-        choices=DAYS_OF_WEEK,
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-group'})
-    )
+    preferred_time_slots = forms.MultipleChoiceField(choices=TIME_SLOTS, widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
+    preferred_days = forms.MultipleChoiceField(choices=DAYS_OF_WEEK, widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Instructor
         fields = ['name', 'preferred_time_slots', 'preferred_days']
         help_texts = {
-            'preferred_time_slots': 'Select one or more preferred time slots.',
-            'preferred_days': 'Select one or more preferred days.'
+            'preferred_time_slots': 'Hold down "Control", or "Command" on a Mac, to select more than one.',
+            'preferred_days': 'Hold down "Control", or "Command" on a Mac, to select more than one.'
         }
-
 class CourseForm(forms.ModelForm):
 
     instructors = forms.ModelMultipleChoiceField(

@@ -54,6 +54,7 @@
           <li class="{% active request roomAdd %}"><a href="{{ roomAdd }}">Classroom</a></li>
           <li class="{% active request courseAdd %}"><a href="{{ courseAdd }}">Lecture</a></li>
           <li class="{% active request 'schedule_page' %}"><a href="{% url 'schedule_page' %}">Schedule Timetable</a></li>
+          <li class="{% active request 'select_timetable_view' %}"><a href="{% url 'select_timetable_view' %}">View Timetable</a></li>
           {% if user.is_authenticated %}
           <li><a href="{% url 'logout' %}"><i style="font-size:1.6rem" class="fa">&#xf08b;</i>Logout</a></li>
           {% endif %}
