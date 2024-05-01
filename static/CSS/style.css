@@ -296,15 +296,16 @@ button {
   height: 40rem;
 }
 
+
 .card .txt h2 {
-  font-size: 4rem;
+  font-size: 6rem;
   margin-bottom: 2rem;
   color: var(--blue5);
   font-weight: bold;
 }
 
 .card .txt p {
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 .card .crdbtn {

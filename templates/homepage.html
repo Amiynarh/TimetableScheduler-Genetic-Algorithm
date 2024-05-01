@@ -9,14 +9,17 @@
 <div class="container-fluid" >
       <div class="card">
         <div class="txt" style="text-align: center;">
-          <h1>Effortless Timetable Management</h1>
-          <p class="p-bold">Streamline your scheduling with our powerful timetable system. Easily create, manage, <br> and view timetables for your organization.</p>
+          <h2>Effortless Timetable Management</h2>
+          <p>Streamline your scheduling with our powerful timetable system. Easily create, manage, <br> and view timetables for Bayero University Kano.</p>
         </div>
 
         <div class="crdbtn" style="display: flex; justify-content: center; gap: 2rem;">
           <a href="{% url 'select_timetable_view' %}" class="btn">View Timetable</a>
-          <a href="{% url 'generate_timetable' %}" class="btn-trans">Generate Timetable</a>
+          <a href="{% url 'generate_timetable' %}" class="btn">Generate Timetable</a>
         </div>
+      </div>
+      <div class="inner">
+        <img src="{% static 'img/vect1.png' %}" class="inner-img" style="width: 1000px; height: auto">
       </div>
  </div>
 

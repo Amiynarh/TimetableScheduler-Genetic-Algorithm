@@ -6,11 +6,13 @@
     <div class="halfpart">
         <div class="card">
             <div class="txt" style="text-align: center;">
-                <h2>View Timetable</h2>
+                <h2>Welcome to the Faculty Of Computing Timetable </h2>
+                <p>Here you can view and print the timetable for students and instructors.
+                </p>
             </div>
             <div class="crdbtn" style="display: flex; justify-content: center; gap: 2rem;">
-                <a href="{% url 'view_timetable' timetable_id %}" class="btn">Student View</a>
-                <a href="{% url 'instructor_timetable' timetable_id %}" class="btn">Instructor View</a>
+                <a href="{% url 'view_timetable' timetable_id %}" class="btn">View Student Timetable</a>
+                <a href="{% url 'instructor_timetable' timetable_id %}" class="btn">View Instructor Timetable</a>
             </div>
         </div>
     </div>
