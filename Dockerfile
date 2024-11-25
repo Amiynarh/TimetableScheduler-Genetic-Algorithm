@@ -4,8 +4,10 @@ FROM python:3.9-slim
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV DEBUG 0
+ENV DJANGO_SECRET_KEY="your-secret-key-here"
 
 WORKDIR /app
+
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
