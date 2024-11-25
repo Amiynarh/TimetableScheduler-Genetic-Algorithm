@@ -18,16 +18,14 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip install --upgrade pip \
-    && pip install -r requirements.txt \
-    && pip install gunicorn
+RUN pip install --no-cache-dir -r requirements.txt
+
 
 COPY . .
 
-# Collect static files and migrate
-RUN python manage.py collectstatic --noinput || true
-RUN python manage.py migrate || true
-
+# Collect static files 
+RUN mkdir -p assets
+RUN python manage.py collectstatic --noinput
 
 EXPOSE 80
 

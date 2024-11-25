@@ -16,6 +16,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*', 'scheduler.hcsapp.cloud', 'timetable.hcsapp.cloud']
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -120,7 +121,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Changed from 'assets' to 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets')  # Changed from 'assets' to 'staticfiles'
 
 # Add WhiteNoise configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
