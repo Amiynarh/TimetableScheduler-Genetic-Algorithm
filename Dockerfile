@@ -25,11 +25,17 @@ RUN pip install --upgrade pip \
 COPY . .
 
 # Collect static files and migrate
-RUN python manage.py collectstatic --noinput
-RUN python manage.py migrate
+RUN python manage.py collectstatic --noinput || true
+RUN python manage.py migrate || true
 
+
+# Create start script
+RUN echo '#!/bin/bash\n\
+python manage.py migrate\n\
+gunicorn Scheduler.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120 --access-logfile - --error-logfile - --log-level debug\n'\
+> ./start.sh && chmod +x ./start.sh
 
 EXPOSE 8000
 
-# Start gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "Scheduler.wsgi:application"]
+# Start the application
+CMD ["./start.sh"]
