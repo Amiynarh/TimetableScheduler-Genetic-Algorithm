@@ -29,13 +29,6 @@ RUN python manage.py collectstatic --noinput || true
 RUN python manage.py migrate || true
 
 
-# Create start script
-RUN echo '#!/bin/bash\n\
-python manage.py migrate\n\
-gunicorn Scheduler.wsgi:application --bind 0.0.0.0:80 --workers 3 --timeout 120 --access-logfile - --error-logfile - --log-level debug\n'\
-> ./start.sh && chmod +x ./start.sh
-
 EXPOSE 80
 
-# Start the application
-CMD ["./start.sh"]
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "--workers", "3", "Scheduler.wsgi:application"]
