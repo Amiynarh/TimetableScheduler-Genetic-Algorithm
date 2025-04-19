@@ -12,6 +12,7 @@ from django.utils import timezone
 VARS = {'generationNum': 0,
         'terminateGens': False}
 
+
 def signup_view(request):
     if request.method == 'POST':
         form = UserSignupForm(request.POST)
